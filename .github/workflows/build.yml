@@ -1,0 +1,36 @@
+name: Build APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Unpack the project
+        run: |
+          rm -rf project
+          mkdir project
+          unzip -q agpeya-tv.zip -d project
+          chmod +x project/gradlew
+      - name: Build
+        working-directory: project
+        run: ./gradlew --no-daemon assembleDebug
+      - name: Name the APK
+        run: cp project/app/build/outputs/apk/debug/app-debug.apk agpeya-tv.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: agpeya-tv
+          path: agpeya-tv.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Agpeya TV build ${{ github.run_number }}
+          files: agpeya-tv.apk
