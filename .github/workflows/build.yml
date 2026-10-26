@@ -18,7 +18,7 @@ jobs:
         run: |
           rm -rf project
           mkdir project
-          unzip -q agpeya-tv-v10.zip -d project
+          unzip -q "$(ls agpeya-tv-v*.zip | sort -V | tail -1)" -d project
           chmod +x project/gradlew
       - name: Build
         working-directory: project
